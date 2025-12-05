@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEY SİYOS | Site Sakini Paneli</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="layout" data-role="Resident">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <span class="pill">KEY SİYOS</span>
+                <span>Site Sakini</span>
+            </div>
+            <nav class="nav-group">
+                <a class="nav-item active" data-target="ticketsView">Taleplerim</a>
+                <a class="nav-item" data-target="createView">Talep Oluştur</a>
+                <a class="nav-item" data-target="issuesView">Sitede Son Durum</a>
+                <a class="nav-item" id="logoutBtn">Çıkış Yap</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="main-header">
+                <div>
+                    <h1>Merhaba, <span id="residentName"></span></h1>
+                    <p class="muted">Talep süreçlerinizi burada takip edebilirsiniz.</p>
+                </div>
+                <button class="btn btn-secondary" id="openTicketModal">Yeni Talep Oluştur</button>
+            </header>
+
+            <section id="ticketsView" class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Talep Filtreleri</span>
+                        <div class="pill" id="apartmentInfo"></div>
+                    </div>
+                    <div class="form-grid" id="filters">
+                        <div class="form-group">
+                            <label for="statusFilter">Durum</label>
+                            <select id="statusFilter">
+                                <option value="">Tümü</option>
+                                <option value="Open">Yeni</option>
+                                <option value="Assigned">Atandı</option>
+                                <option value="In_Progress">İşlemde</option>
+                                <option value="Resolved">Çözüldü</option>
+                                <option value="Closed">Kapandı</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryFilter">Kategori</label>
+                            <select id="categoryFilter">
+                                <option value="">Tümü</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid" id="residentTickets"></div>
+            </section>
+
+            <section id="createView" class="grid" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Yeni Talep</span>
+                        <span class="muted">3 adımda kolayca bildirin.</span>
+                    </div>
+                    <div class="step-indicator">
+                        <div class="step active" data-step="1"></div>
+                        <div class="step" data-step="2"></div>
+                        <div class="step" data-step="3"></div>
+                    </div>
+                    <form class="form-grid" id="createTicketForm">
+                        <div class="form-group" data-step="1">
+                            <label for="ticketCategory">Kategori</label>
+                            <select id="ticketCategory" required></select>
+                        </div>
+                        <div class="form-group" data-step="1">
+                            <label for="ticketPriority">Öncelik</label>
+                            <select id="ticketPriority">
+                                <option value="Low">Düşük</option>
+                                <option value="Medium">Orta</option>
+                                <option value="High">Yüksek</option>
+                                <option value="Critical">Kritik</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" data-step="2">
+                            <label for="ticketTitle">Başlık</label>
+                            <input type="text" id="ticketTitle" maxlength="80" placeholder="Örn. B blok asansör çalışmıyor" required>
+                        </div>
+                        <div class="form-group" data-step="2">
+                            <label for="ticketDescription">Açıklama</label>
+                            <textarea id="ticketDescription" maxlength="500" placeholder="Sorunu detaylıca anlatın." required></textarea>
+                        </div>
+
+                        <div class="form-group" data-step="3">
+                            <label for="ticketAttachments">Fotoğraf / Dosya</label>
+                            <div class="upload-dropzone">
+                                <p>Dosya eklemek için sürükleyip bırakın veya tıklayın.</p>
+                                <input type="file" id="ticketAttachments" accept="image/*" multiple style="display:none;">
+                                <button type="button" class="btn btn-ghost" id="triggerUpload">Dosya Seç</button>
+                                <div id="attachmentPreview" class="muted" style="margin-top:12px;"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-secondary">Talebi Gönder</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="issuesView" class="grid" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Sitede Güncel Sorunlar</span>
+                        <span class="muted">Bilgilendirme amaçlıdır, işlem gerektirmez.</span>
+                    </div>
+                    <div class="grid" id="commonIssues"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="ticketModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Yeni Talep Oluştur</h2>
+                <button class="btn btn-ghost" data-close>×</button>
+            </div>
+            <form class="form-grid" id="quickTicketForm">
+                <div class="form-group">
+                    <label for="quickCategory">Kategori</label>
+                    <select id="quickCategory" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="quickTitle">Başlık</label>
+                    <input type="text" id="quickTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="quickDescription">Açıklama</label>
+                    <textarea id="quickDescription" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Talebi Gönder</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="residentToast"></div>
+
+    <script src="js/resident.js" type="module"></script>
+</body>
+</html>

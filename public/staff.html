@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEY SİYOS | Personel Paneli</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="layout" data-role="Staff">
+        <aside class="sidebar" id="staffSidebar">
+            <div class="brand">
+                <span class="pill">KEY SİYOS</span>
+                <span>Personel</span>
+            </div>
+            <nav class="nav-group">
+                <a class="nav-item active" data-target="tasksView">Görevlerim</a>
+                <a class="nav-item" id="staffLogout">Çıkış Yap</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="main-header">
+                <div>
+                    <h1>İyi çalışmalar, <span id="staffName"></span></h1>
+                    <p class="muted">Atanan işleri öncelik sırasına göre tamamlayın.</p>
+                </div>
+                <div class="pill" id="staffStats"></div>
+            </header>
+
+            <section id="tasksView" class="grid">
+                <div class="grid" id="staffTickets"></div>
+            </section>
+        </main>
+    </div>
+
+    <div class="toast" id="staffToast"></div>
+    <script src="js/staff.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEY SİYOS | Giriş Yap</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231f7a8c'/><path d='M32 48l15 15 22-30' stroke='%23fff' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+</head>
+<body class="auth-layout">
+    <div class="auth-card">
+        <div class="pill">KEY SİYOS - Site İstek &amp; Şikayet Yönetim Sistemi</div>
+        <h1>Tek panel, tüm site yönetimi.</h1>
+        <p>Talep akışlarını, personel görevlerini ve sakin geri bildirimlerini tek yerden takip edin.</p>
+
+        <form class="auth-form" id="loginForm" autocomplete="on">
+            <div class="form-group">
+                <label for="email">E-Posta</label>
+                <input type="email" id="email" name="email" placeholder="ornek@siyos.local" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Şifre</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Giriş Yap</button>
+        </form>
+
+        <div class="card" style="padding:16px; gap:6px;">
+            <strong>Test Kullanıcıları</strong>
+            <span class="muted">Yönetici: admin@siyos.local / Admin123!</span>
+            <span class="muted">Personel: staff@siyos.local / Staff123!</span>
+            <span class="muted">Sakin: resident@siyos.local / Resident123!</span>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="js/login.js" type="module"></script>
+</body>
+</html>

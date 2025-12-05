@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEY SİYOS | Yönetici Paneli</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="layout" data-role="Admin">
+        <aside class="sidebar" id="adminSidebar">
+            <div class="brand">
+                <span class="pill">KEY SİYOS</span>
+                <span>Yönetici</span>
+            </div>
+            <nav class="nav-group">
+                <a class="nav-item active" data-target="dashboardView">Dashboard</a>
+                <a class="nav-item" data-target="ticketsView">Talepler</a>
+                <a class="nav-item" data-target="categoriesView">Kategoriler</a>
+                <a class="nav-item" data-target="usersView">Kullanıcılar</a>
+                <a class="nav-item" id="adminLogout">Çıkış Yap</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="main-header">
+                <div>
+                    <h1>Merhaba, <span id="adminName"></span></h1>
+                    <p class="muted">Site genelindeki operasyonlara hızlıca hakim olun.</p>
+                </div>
+                <div class="muted" id="adminDate"></div>
+            </header>
+
+            <section id="dashboardView" class="grid">
+                <div class="kpi-grid" id="kpiContainer"></div>
+
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+                    <div class="card" id="categoryChart">
+                        <div class="card-header">
+                            <span>Kategori Dağılımı</span>
+                            <span class="pill" id="categoryTotal"></span>
+                        </div>
+                        <div id="categoryChartBody" class="grid"></div>
+                    </div>
+
+                    <div class="card" id="blockHeatmap">
+                        <div class="card-header">
+                            <span>Blok Bazlı Yoğunluk</span>
+                            <span class="muted">Son 30 gün</span>
+                        </div>
+                        <div id="heatmapBody" class="grid"></div>
+                    </div>
+
+                    <div class="card" id="staffPerformance">
+                        <div class="card-header">
+                            <span>Personel Performansı</span>
+                            <span class="muted">Ort. çözüm süresi (saat)</span>
+                        </div>
+                        <div id="staffPerformanceBody" class="grid"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ticketsView" class="grid" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Atama Bekleyen Talepler</span>
+                        <div class="form-group" style="min-width:180px;">
+                            <label for="ticketStatusFilter">Durum</label>
+                            <select id="ticketStatusFilter">
+                                <option value="Open">Yeni</option>
+                                <option value="Assigned">Atandı</option>
+                                <option value="In_Progress">İşlemde</option>
+                                <option value="Resolved">Çözüldü</option>
+                                <option value="Closed">Kapandı</option>
+                                <option value="">Tümü</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid" id="ticketsTable"></div>
+                </div>
+            </section>
+
+            <section id="categoriesView" class="grid" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Kategoriler</span>
+                        <span class="muted">SLA sürelerini yönetin.</span>
+                    </div>
+                    <div class="form-grid" id="categoryList"></div>
+                    <form class="form-grid" id="categoryForm">
+                        <div class="form-group">
+                            <label for="categoryName">Kategori Adı</label>
+                            <input type="text" id="categoryName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categorySla">Hedef Süre (saat)</label>
+                            <input type="number" id="categorySla" min="1" value="24">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Kategori Ekle</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="usersView" class="grid" style="display:none;">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Kullanıcı Listesi</span>
+                        <span class="muted">Roller ve durumlar.</span>
+                    </div>
+                    <div class="grid" id="usersTable"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="assignModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Talep Atama</h2>
+                <button class="btn btn-ghost" data-close>×</button>
+            </div>
+            <form class="form-grid" id="assignForm">
+                <input type="hidden" id="assignTicketId">
+                <div class="form-group">
+                    <label for="assignStaff">Personel</label>
+                    <select id="assignStaff" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="assignNote">Not</label>
+                    <textarea id="assignNote" rows="3" placeholder="Personel bilgilendirmesi"></textarea>
+                </div>
+                <button type="submit" class="btn btn-secondary">Atamayı Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="adminToast"></div>
+
+    <script src="js/admin.js" type="module"></script>
+</body>
+</html>
