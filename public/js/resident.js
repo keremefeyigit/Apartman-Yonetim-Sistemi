@@ -112,18 +112,28 @@ const ratingTemplate = (ticket) => {
     `;
 };
 
+const escapeHtml = (str) => {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};
+
 const buildTicketCard = (ticket) => `
-    <article class="ticket-card" data-id="${ticket.id}" data-status="${ticket.status}" data-category="${ticket.category_id}">
+    <article class="ticket-card" data-id="${ticket.id}" data-status="${escapeHtml(ticket.status)}" data-category="${ticket.category_id}">
         <div class="ticket-meta">
             ${renderStatus(ticket.status)}
             ${renderPriority(ticket.priority)}
-            <span>${ticket.category_name || 'Kategori yok'}</span>
+            <span>${escapeHtml(ticket.category_name || 'Kategori yok')}</span>
             <span>${new Date(ticket.created_at).toLocaleString('tr-TR')}</span>
         </div>
-        <h3>${ticket.title}</h3>
-        <p class="muted">${ticket.description}</p>
-        <div class="muted">Atanan: ${ticket.assigned_full_name || 'Henüz atanmadı'}</div>
-        ${ticket.attachments && ticket.attachments.length ? `<div class="attachment-list">${ticket.attachments.map((name) => `<span class="pill">${name}</span>`).join('')}</div>` : ''}
+        <h3>${escapeHtml(ticket.title)}</h3>
+        <p class="muted">${escapeHtml(ticket.description)}</p>
+        <div class="muted">Atanan: ${escapeHtml(ticket.assigned_full_name || 'Henüz atanmadı')}</div>
+        ${ticket.attachments && ticket.attachments.length ? `<div class="attachment-list">${ticket.attachments.map((name) => `<span class="pill">${escapeHtml(name)}</span>`).join('')}</div>` : ''}
         ${ratingTemplate(ticket)}
     </article>
 `;
@@ -134,8 +144,8 @@ const buildIssueCard = (issue) => `
             ${renderStatus(issue.status)}
             ${renderPriority(issue.priority)}
         </div>
-        <h3>${issue.title}</h3>
-        <p class="muted">${issue.category_name || ''} • ${issue.block_name ? `${issue.block_name}${issue.door_number ? ' - Kapı ' + issue.door_number : ''}` : 'Genel'}</p>
+        <h3>${escapeHtml(issue.title)}</h3>
+        <p class="muted">${escapeHtml(issue.category_name || '')} • ${issue.block_name ? `${escapeHtml(issue.block_name)}${issue.door_number ? ' - Kapı ' + escapeHtml(issue.door_number) : ''}` : 'Genel'}</p>
         <span class="muted">${new Date(issue.created_at).toLocaleString('tr-TR')}</span>
     </article>
 `;

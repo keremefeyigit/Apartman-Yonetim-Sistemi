@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: apartman_yonetim_sistemi
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-degistiriniz_en_az_32_karakter_uzunlugunda_guclu_jwt_anahtari}
+      - DB_PATH=/usr/src/app/database/database.sqlite
+    volumes:
+      - app_data:/usr/src/app/database
+
+volumes:
+  app_data:
+    driver: local

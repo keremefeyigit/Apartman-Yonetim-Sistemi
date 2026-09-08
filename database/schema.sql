@@ -1,4 +1,4 @@
-1-- Users Table
+-- Users Table
 CREATE TABLE IF NOT EXISTS Users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     full_name TEXT NOT NULL,

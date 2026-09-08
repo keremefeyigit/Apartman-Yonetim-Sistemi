@@ -8,7 +8,8 @@ const verifyToken = (req, res, next) => {
         return res.status(401).json({ error: 'Kimlik doğrulama gerekli.' });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
+    const jwtSecret = process.env.JWT_SECRET || 'apartman_default_secret_key_change_in_prod';
+    jwt.verify(token, jwtSecret, (err, payload) => {
         if (err) {
             return res.status(403).json({ error: 'Geçersiz veya süresi dolmuş oturum.' });
         }

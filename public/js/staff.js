@@ -60,17 +60,27 @@ const statusBadge = (status) => {
     return `<span class="status-badge ${map[status] || 'status-open'}">${label}</span>`;
 };
 
+const escapeHtml = (str) => {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};
+
 const renderTickets = (tickets) => {
     if (!staffTickets) return;
     staffTickets.innerHTML = tickets.length ? tickets.map((ticket) => `
         <div class="card" style="padding:20px; gap:12px;" data-ticket="${ticket.id}">
             <div class="ticket-meta">
                 ${statusBadge(ticket.status)}
-                <span>${ticket.category_name || 'Kategori yok'}</span>
-                <span>${ticket.block_name ? `${ticket.block_name} • Kapı ${ticket.door_number || '-'}` : 'Genel'}</span>
+                <span>${escapeHtml(ticket.category_name || 'Kategori yok')}</span>
+                <span>${ticket.block_name ? `${escapeHtml(ticket.block_name)} • Kapı ${escapeHtml(ticket.door_number || '-')}` : 'Genel'}</span>
             </div>
-            <h3>${ticket.title}</h3>
-            <p class="muted">${ticket.description}</p>
+            <h3>${escapeHtml(ticket.title)}</h3>
+            <p class="muted">${escapeHtml(ticket.description)}</p>
             <textarea class="note" rows="3" placeholder="Not bırakın (isteğe bağlı)"></textarea>
             <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
                 <button class="btn btn-secondary" data-action="In_Progress">İşe Başla</button>

@@ -108,7 +108,8 @@ async function createResidentTicket(req, res) {
             ticketId: insertResult.lastID
         });
     } catch (error) {
-        res.status(500).json({ error: 'Talep oluşturma sırasında hata: ' + error.message });
+        console.error('Create ticket error:', error);
+        res.status(500).json({ error: 'Talep oluşturma sırasında sunucu hatası oluştu.' });
     }
 }
 
@@ -130,7 +131,8 @@ async function getResidentTickets(req, res) {
 
         res.json({ tickets: tickets.map(mapTicketRow) });
     } catch (error) {
-        res.status(500).json({ error: 'Talepler getirilemedi: ' + error.message });
+        console.error('Get resident tickets error:', error);
+        res.status(500).json({ error: 'Talepler yüklenirken sunucu hatası oluştu.' });
     }
 }
 
@@ -167,7 +169,8 @@ async function getCommonIssues(req, res) {
 
         res.json({ issues: tickets });
     } catch (error) {
-        res.status(500).json({ error: 'Genel sorunlar alınamadı: ' + error.message });
+        console.error('Get common issues error:', error);
+        res.status(500).json({ error: 'Genel sorunlar yüklenirken sunucu hatası oluştu.' });
     }
 }
 
@@ -201,7 +204,8 @@ async function rateTicket(req, res) {
 
         res.json({ message: 'Geri bildiriminiz için teşekkürler.' });
     } catch (error) {
-        res.status(500).json({ error: 'Geri bildirim kaydedilemedi: ' + error.message });
+        console.error('Rate ticket error:', error);
+        res.status(500).json({ error: 'Geri bildirim kaydedilirken sunucu hatası oluştu.' });
     }
 }
 
@@ -233,7 +237,8 @@ async function getAllTickets(req, res) {
 
         res.json({ tickets: rows.map(mapTicketRow) });
     } catch (error) {
-        res.status(500).json({ error: 'Talepler yüklenemedi: ' + error.message });
+        console.error('Get all tickets error:', error);
+        res.status(500).json({ error: 'Talepler yüklenirken sunucu hatası oluştu.' });
     }
 }
 
@@ -298,7 +303,8 @@ async function getDashboardMetrics(req, res) {
             staffPerformance
         });
     } catch (error) {
-        res.status(500).json({ error: 'Dashboard verileri alınamadı: ' + error.message });
+        console.error('Dashboard metrics error:', error);
+        res.status(500).json({ error: 'Dashboard verileri alınırken sunucu hatası oluştu.' });
     }
 }
 
@@ -328,7 +334,8 @@ async function assignTicket(req, res) {
 
         res.json({ message: 'Talep personele atandı.' });
     } catch (error) {
-        res.status(500).json({ error: 'Atama yapılamadı: ' + error.message });
+        console.error('Assign ticket error:', error);
+        res.status(500).json({ error: 'Atama işlemi sırasında sunucu hatası oluştu.' });
     }
 }
 
@@ -362,7 +369,8 @@ async function adminUpdateTicketStatus(req, res) {
 
         res.json({ message: 'Talep durumu güncellendi.' });
     } catch (error) {
-        res.status(500).json({ error: 'Durum güncellenemedi: ' + error.message });
+        console.error('Admin update ticket status error:', error);
+        res.status(500).json({ error: 'Durum güncellenirken sunucu hatası oluştu.' });
     }
 }
 
@@ -371,7 +379,8 @@ async function getCategories(req, res) {
         const categories = await allAsync('SELECT * FROM Categories ORDER BY name ASC');
         res.json({ categories });
     } catch (error) {
-        res.status(500).json({ error: 'Kategoriler alınamadı: ' + error.message });
+        console.error('Get categories error:', error);
+        res.status(500).json({ error: 'Kategoriler yüklenirken sunucu hatası oluştu.' });
     }
 }
 
@@ -389,7 +398,8 @@ async function createCategory(req, res) {
         );
         res.status(201).json({ message: 'Kategori oluşturuldu.', categoryId: result.lastID });
     } catch (error) {
-        res.status(500).json({ error: 'Kategori eklenemedi: ' + error.message });
+        console.error('Create category error:', error);
+        res.status(500).json({ error: 'Kategori eklenirken sunucu hatası oluştu.' });
     }
 }
 
@@ -409,7 +419,8 @@ async function getStaffTickets(req, res) {
 
         res.json({ tickets: tickets.map(mapTicketRow) });
     } catch (error) {
-        res.status(500).json({ error: 'Görevler getirilemedi: ' + error.message });
+        console.error('Get staff tickets error:', error);
+        res.status(500).json({ error: 'Görevler getirilirken sunucu hatası oluştu.' });
     }
 }
 
@@ -443,7 +454,8 @@ async function staffUpdateStatus(req, res) {
 
         res.json({ message: 'Durum güncellendi.' });
     } catch (error) {
-        res.status(500).json({ error: 'Durum güncellenemedi: ' + error.message });
+        console.error('Staff update status error:', error);
+        res.status(500).json({ error: 'Durum güncellenirken sunucu hatası oluştu.' });
     }
 }
 

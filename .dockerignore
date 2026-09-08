@@ -4,3 +4,9 @@ Dockerfile
 .dockerignore
 .git
 .gitignore
+.env*
+*.sqlite
+*.sqlite3
+*.db
+logs
+*.log

@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
-const dbPath = path.resolve(__dirname, 'database.sqlite');
+const dbPath = process.env.DB_PATH ? path.resolve(process.env.DB_PATH) : path.resolve(__dirname, 'database.sqlite');
 const schemaPath = path.resolve(__dirname, 'schema.sql');
 
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -11,6 +11,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
         console.error('Error opening database ' + dbPath + ': ' + err.message);
     } else {
         console.log('Connected to the SQLite database.');
+        db.run('PRAGMA foreign_keys = ON;');
         initDb();
     }
 });

@@ -86,9 +86,10 @@ async function login(req, res) {
             [user.id]
         );
 
+        const jwtSecret = process.env.JWT_SECRET || 'apartman_default_secret_key_change_in_prod';
         const token = jwt.sign(
             buildTokenPayload(user, apartmentInfo),
-            process.env.JWT_SECRET,
+            jwtSecret,
             { expiresIn: '24h' }
         );
 
@@ -98,23 +99,34 @@ async function login(req, res) {
             user: sanitizeUser(user, apartmentInfo)
         });
     } catch (error) {
-        res.status(500).json({ error: 'Sunucu hatası: ' + error.message });
+        console.error('Login error:', error);
+        res.status(500).json({ error: 'Giriş işlemi sırasında sunucu hatası oluştu.' });
     }
 }
 
 async function register(req, res) {
-    const { full_name, email, password, role } = req.body;
+    const { full_name, email, password } = req.body;
 
-    if (!full_name || !email || !password || !role) {
+    if (!full_name || !email || !password) {
         return res.status(400).json({ error: 'Tüm alanlar zorunludur.' });
     }
 
-    if (!['Admin', 'Staff', 'Resident'].includes(role)) {
-        return res.status(400).json({ error: 'Geçersiz rol.' });
+    const trimmedEmail = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+        return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
     }
 
+    if (password.length < 6) {
+        return res.status(400).json({ error: 'Şifre en az 6 karakter olmalıdır.' });
+    }
+
+    // Güvenlik: Genel kayıt uç noktası sadece Site Sakini ('Resident') oluşturabilir.
+    // Yetki yükseltme (Privilege Escalation) zafiyetini engeller.
+    const role = 'Resident';
+
     try {
-        const existing = await getAsync('SELECT id FROM Users WHERE email = ?', [email.trim().toLowerCase()]);
+        const existing = await getAsync('SELECT id FROM Users WHERE email = ?', [trimmedEmail]);
         if (existing) {
             return res.status(409).json({ error: 'Email adresi kullanımda.' });
         }
@@ -122,7 +134,7 @@ async function register(req, res) {
         const hash = await bcrypt.hash(password, 10);
         const result = await runAsync(
             'INSERT INTO Users (full_name, email, password_hash, role, is_active) VALUES (?, ?, ?, ?, 1)',
-            [full_name, email.trim().toLowerCase(), hash, role]
+            [full_name.trim(), trimmedEmail, hash, role]
         );
 
         const newUser = await getAsync('SELECT * FROM Users WHERE id = ?', [result.lastID]);
@@ -131,7 +143,8 @@ async function register(req, res) {
             user: sanitizeUser(newUser, null)
         });
     } catch (error) {
-        res.status(500).json({ error: 'Sunucu hatası: ' + error.message });
+        console.error('Register error:', error);
+        res.status(500).json({ error: 'Kayıt işlemi sırasında sunucu hatası oluştu.' });
     }
 }
 

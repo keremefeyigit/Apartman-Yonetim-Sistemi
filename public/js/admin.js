@@ -58,6 +58,16 @@ const fetchWithAuth = async (url, options = {}) => {
     return response;
 };
 
+const escapeHtml = (str) => {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+};
+
 const renderKpis = (kpis) => {
     if (!kpiContainer) return;
     const labels = {
@@ -78,10 +88,11 @@ const renderProgressList = (items, total) => {
     const max = total || items.reduce((sum, item) => sum + Number(item.count || 0), 0) || 1;
     return items.map((item) => {
         const percent = Math.round(((item.count || 0) / max) * 100);
+        const title = escapeHtml(item.category_name || item.block_name || item.staff_name);
         return `
             <div class="card" style="padding:16px; gap:8px;">
                 <div class="form-group">
-                    <strong>${item.category_name || item.block_name || item.staff_name}</strong>
+                    <strong>${title}</strong>
                     <span class="muted">${item.count ?? item.total ?? 0} kayıt</span>
                 </div>
                 <div style="height:6px; background:var(--surface-200); border-radius:999px; overflow:hidden;">
@@ -112,7 +123,7 @@ const loadDashboard = async () => {
     if (staffPerformanceBody) {
         staffPerformanceBody.innerHTML = (data.staffPerformance || []).map((item) => `
             <div class="card" style="padding:16px; gap:6px;">
-                <strong>${item.staff_name || 'Tanımsız'}</strong>
+                <strong>${escapeHtml(item.staff_name || 'Tanımsız')}</strong>
                 <span class="muted">${(item.avg_hours || 0).toFixed ? item.avg_hours.toFixed(1) : Number(item.avg_hours || 0).toFixed(1)} saat</span>
                 <span class="muted">${item.total || 0} talep</span>
             </div>
@@ -133,17 +144,17 @@ const loadUsers = async () => {
     if (usersTable) {
         usersTable.innerHTML = users.map((item) => `
             <div class="card" style="padding:16px;">
-                <strong>${item.full_name}</strong>
-                <div class="muted">${item.email}</div>
-                <div class="muted">${item.role}</div>
-                <div class="muted">${item.block_name ? `${item.block_name} / Kapı ${item.door_number || '-'}` : 'Daire ataması yok'}</div>
+                <strong>${escapeHtml(item.full_name)}</strong>
+                <div class="muted">${escapeHtml(item.email)}</div>
+                <div class="muted">${escapeHtml(item.role)}</div>
+                <div class="muted">${item.block_name ? `${escapeHtml(item.block_name)} / Kapı ${escapeHtml(item.door_number || '-')}` : 'Daire ataması yok'}</div>
             </div>
         `).join('');
     }
 
     if (assignStaffSelect) {
         assignStaffSelect.innerHTML = staffUsers.map((staff) => `
-            <option value="${staff.id}">${staff.full_name}</option>
+            <option value="${staff.id}">${escapeHtml(staff.full_name)}</option>
         `).join('');
     }
 };
@@ -153,15 +164,15 @@ const renderTickets = (tickets) => {
     ticketsTable.innerHTML = tickets.length ? tickets.map((ticket) => `
         <div class="card" style="padding:20px; gap:12px;" data-ticket="${ticket.id}">
             <div class="ticket-meta">
-                ${ticket.category_name || 'Kategori yok'}
+                ${escapeHtml(ticket.category_name || 'Kategori yok')}
                 ${renderStatus(ticket.status)}
                 ${renderPriority(ticket.priority)}
-                <span>${ticket.block_name ? ticket.block_name : 'Genel'}</span>
+                <span>${ticket.block_name ? escapeHtml(ticket.block_name) : 'Genel'}</span>
             </div>
-            <h3>${ticket.title}</h3>
-            <p class="muted">${ticket.description}</p>
-            <div class="muted">Talep Sahibi: ${ticket.requester_name}</div>
-            <div class="muted">Atanan: ${ticket.assigned_full_name || 'Henüz atanmadı'}</div>
+            <h3>${escapeHtml(ticket.title)}</h3>
+            <p class="muted">${escapeHtml(ticket.description)}</p>
+            <div class="muted">Talep Sahibi: ${escapeHtml(ticket.requester_name)}</div>
+            <div class="muted">Atanan: ${escapeHtml(ticket.assigned_full_name || 'Henüz atanmadı')}</div>
             <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
                 <button class="btn btn-secondary" data-assign="${ticket.id}">Atama Yap</button>
                 <select class="status-select" data-id="${ticket.id}">
@@ -230,7 +241,7 @@ const loadCategories = async () => {
     if (categoryList) {
         categoryList.innerHTML = categories.length ? categories.map((cat) => `
             <div class="card" style="padding:16px;">
-                <strong>${cat.name}</strong>
+                <strong>${escapeHtml(cat.name)}</strong>
                 <div class="muted">SLA: ${cat.sla_hours} saat</div>
             </div>
         `).join('') : '<div class="muted">Henüz kategori yok.</div>';
