@@ -21,10 +21,10 @@ before(async () => {
     // Express uygulamasını yükle
     const express = require('express');
     const cors = require('cors');
-    require('../database/db');
+    const db = require('../database/db');
 
-    // DB başlatması için kısa bekleme
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    // DB başlatmasının tamamlanmasını deterministik olarak bekle
+    await db.readyPromise;
 
     const authRoutes = require('../routes/auth');
     const residentRoutes = require('../routes/resident');
@@ -160,3 +160,68 @@ describe('2. Rol Tabanlı Erişim Kontrolü (RBAC)', () => {
         assert.ok(data.kpis, 'KPI verileri dönmeli');
     });
 });
+
+describe('3. Talep Güvenliği ve Bilgi İfşası Koruması (Ticket Security & Privacy)', () => {
+    let residentToken;
+
+    before(async () => {
+        const loginRes = await fetch(`${baseUrl}/api/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: 'resident@siyos.local', password: 'Resident123!' })
+        });
+        const data = await loginRes.json();
+        residentToken = data.token;
+    });
+
+    test('POST /api/resident/tickets - Geçersiz öncelik seviyesini reddetmeli (400)', async () => {
+        const res = await fetch(`${baseUrl}/api/resident/tickets`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${residentToken}`
+            },
+            body: JSON.stringify({
+                category_id: 1,
+                title: 'Test Başlık',
+                description: 'Açıklama detayı',
+                priority: 'SuperUrgent'
+            })
+        });
+        assert.equal(res.status, 400);
+        const data = await res.json();
+        assert.match(data.error, /öncelik/i);
+    });
+
+    test('POST /api/resident/tickets - Geçersiz / Olmayan kategori reddetmeli (400)', async () => {
+        const res = await fetch(`${baseUrl}/api/resident/tickets`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${residentToken}`
+            },
+            body: JSON.stringify({
+                category_id: 999999,
+                title: 'Test Başlık',
+                description: 'Açıklama detayı',
+                priority: 'High'
+            })
+        });
+        assert.equal(res.status, 400);
+        const data = await res.json();
+        assert.match(data.error, /kategori/i);
+    });
+
+    test('GET /api/resident/common-issues - Sakinlerin daire/kapı numarası sızdırılmamalı (Information Disclosure koruması)', async () => {
+        const res = await fetch(`${baseUrl}/api/resident/common-issues`, {
+            headers: { Authorization: `Bearer ${residentToken}` }
+        });
+        assert.equal(res.status, 200);
+        const data = await res.json();
+        assert.ok(Array.isArray(data.issues), 'Sorunlar dizisi dönmeli');
+        data.issues.forEach((issue) => {
+            assert.equal(issue.door_number, undefined, 'door_number bilgisi genel sorunlarda sızdırılmamalı');
+        });
+    });
+});
+

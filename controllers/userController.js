@@ -32,6 +32,14 @@ const allAsync = (sql, params = []) => new Promise((resolve, reject) => {
     });
 });
 
+const getJwtSecret = () => {
+    const secret = process.env.JWT_SECRET;
+    if (process.env.NODE_ENV === 'production' && (!secret || secret === 'apartman_default_secret_key_change_in_prod')) {
+        throw new Error('GÜVENLİK HATASI: Üretim ortamında güvenli bir JWT_SECRET tanımlanmalıdır!');
+    }
+    return secret || 'apartman_default_secret_key_change_in_prod';
+};
+
 const buildTokenPayload = (user, apartmentInfo) => ({
     id: user.id,
     role: user.role,
@@ -86,7 +94,7 @@ async function login(req, res) {
             [user.id]
         );
 
-        const jwtSecret = process.env.JWT_SECRET || 'apartman_default_secret_key_change_in_prod';
+        const jwtSecret = getJwtSecret();
         const token = jwt.sign(
             buildTokenPayload(user, apartmentInfo),
             jwtSecret,
@@ -163,7 +171,8 @@ async function listUsers(req, res) {
 
         res.json({ users });
     } catch (error) {
-        res.status(500).json({ error: 'Sunucu hatası: ' + error.message });
+        console.error('List users error:', error);
+        res.status(500).json({ error: 'Kullanıcılar listelenirken sunucu hatası oluştu.' });
     }
 }
 

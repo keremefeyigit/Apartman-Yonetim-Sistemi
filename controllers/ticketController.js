@@ -77,7 +77,23 @@ async function createResidentTicket(req, res) {
         return res.status(400).json({ error: 'Kategori, başlık ve açıklama zorunludur.' });
     }
 
+    const validPriorities = ['Low', 'Medium', 'High', 'Critical'];
+    const ticketPriority = priority || 'Low';
+    if (!validPriorities.includes(ticketPriority)) {
+        return res.status(400).json({ error: 'Geçersiz öncelik seviyesi. (Low, Medium, High, Critical olmalıdır)' });
+    }
+
+    const parsedCategoryId = parseInt(category_id, 10);
+    if (isNaN(parsedCategoryId) || parsedCategoryId <= 0) {
+        return res.status(400).json({ error: 'Geçersiz kategori seçimi.' });
+    }
+
     try {
+        const category = await getAsync('SELECT id FROM Categories WHERE id = ?', [parsedCategoryId]);
+        if (!category) {
+            return res.status(400).json({ error: 'Seçilen kategori bulunamadı.' });
+        }
+
         const occupancy = await getAsync(
             'SELECT apartment_id FROM Occupancy WHERE user_id = ? ORDER BY start_date DESC LIMIT 1',
             [userId]
@@ -156,7 +172,7 @@ async function getCommonIssues(req, res) {
 
         const tickets = await allAsync(
             `SELECT Tickets.id, Tickets.title, Tickets.status, Tickets.priority, Tickets.created_at,
-                    Blocks.block_name, Apartments.door_number, Categories.name AS category_name
+                    Blocks.block_name, Categories.name AS category_name
              FROM Tickets
              LEFT JOIN Apartments ON Tickets.apartment_id = Apartments.id
              LEFT JOIN Blocks ON Apartments.block_id = Blocks.id

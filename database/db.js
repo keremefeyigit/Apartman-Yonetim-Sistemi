@@ -6,15 +6,25 @@ const bcrypt = require('bcryptjs');
 const dbPath = process.env.DB_PATH ? path.resolve(process.env.DB_PATH) : path.resolve(__dirname, 'database.sqlite');
 const schemaPath = path.resolve(__dirname, 'schema.sql');
 
+let initResolve;
+let initReject;
+const readyPromise = new Promise((resolve, reject) => {
+    initResolve = resolve;
+    initReject = reject;
+});
+
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('Error opening database ' + dbPath + ': ' + err.message);
+        initReject(err);
     } else {
         console.log('Connected to the SQLite database.');
         db.run('PRAGMA foreign_keys = ON;');
         initDb();
     }
 });
+
+db.readyPromise = readyPromise;
 
 const runAsync = (sql, params = []) => new Promise((resolve, reject) => {
     db.run(sql, params, function(err) {
@@ -51,6 +61,7 @@ async function initDb() {
     db.exec(schema, async (err) => {
         if (err) {
             console.error('Error executing schema:', err.message);
+            initReject(err);
             return;
         }
 
@@ -58,8 +69,10 @@ async function initDb() {
             await ensureSchemaUpdates();
             await seedDefaultData();
             console.log('Database schema initialized.');
+            initResolve();
         } catch (error) {
             console.error('Database initialization error:', error.message);
+            initReject(error);
         }
     });
 }
